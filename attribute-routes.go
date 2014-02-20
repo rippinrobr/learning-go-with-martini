@@ -1,11 +1,12 @@
 package main
 
-import (
-  "fmt"
+import ( 
   "net/http"
   "strings"
   "encoding/json"
- "github.com/codegangsta/martini"
+  "github.com/codegangsta/martini"
+  "labix.org/v2/mgo"  // brings the mgo library into my code
+  "labix.org/v2/mgo/bson" 
 )
 
 // Structs and related code
@@ -42,8 +43,15 @@ func jsonString( obj jsonConvertible ) (s string) {
 
 // Middleware
 func Mongo() martini.Handler {
+  session, err := mgo.Dial( "localhost/goattrs" )
+  if err != nil {
+    panic( err )
+  }
+
   return func (c martini.Context ) {
-    fmt.Println("Someday I will be a MongoDB connection")
+    reqSession := session.Clone()
+    c.Map( reqSession.DB( "goattrs" ) )
+    defer reqSession.Close()
     c.Next()
   }
 }
@@ -53,19 +61,19 @@ func createAttribute( params martini.Params, writer http.ResponseWriter ) (int, 
   resource :=  strings.ToLower( params["resource"] )
   writer.Header().Set("Content-Type", "application/json")
 
-	return http.StatusOK, "Pseudo Create assigned to " + resource
+  return http.StatusOK, "Pseudo Create assigned to " + resource
 }
 
-func getAttributes( params martini.Params, writer http.ResponseWriter ) (int, string) {
-    resource :=  strings.ToLower( params["resource"] )
-    writer.Header().Set("Content-Type", "application/json")
+func getAttributes( params martini.Params, writer http.ResponseWriter, db *mgo.Database) (int, string) {
+  resource :=  strings.ToLower( params["resource"] )
+  writer.Header().Set("Content-Type", "application/json")
 
-    if resource  == "tv" {
-      resourceAttrs := resourceAttributes{"tv", make([]attribute, 1)}
-      resourceAttrs.Attributes[0] = attribute{"", "Location","string", "What facility is the TV located in.", true}
-     
-      return http.StatusOK, jsonString( resourceAttrs )
-    } else {
-      return http.StatusNotFound, jsonString( errorMsg{"Resource not found: " + resource} )
-    }
+  var attrs []resourceAttributes
+  db.C("resource_attributes").Find(bson.M{"resource": resource }).All(&attrs);
+
+  if attrs != nil {
+    return http.StatusOK, jsonString( attrs ) //resourceAttrs )
+  } else {
+    return http.StatusNotFound, jsonString( errorMsg{"No attributes found for the resource: " + resource} )
+  }
 }
