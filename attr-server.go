@@ -8,38 +8,55 @@ import (
   "github.com/codegangsta/martini"
 )
 
-// defining the struct that I will use to create my error message that
-// will be 'jsonified' and sent back to the caller.  The `json:"msg"`
-// tells the json encoder what name to use for this property in the json
-// object
+
+
+type Attribute struct {
+  Name string `json:"name"`
+  DataType string `json:"type"`
+  Description string `json:"description"`
+  Required bool `json:"required"`
+}
+
+type ResourceAttributes struct {
+  ResourceName string `json: "resourceName"`
+  Attributes []Attribute `json: "attributes"`
+}
+
 type ErrorMsg struct {
   Msg string `json:"msg"`
 }
 
-func (e ErrorMsg) String() (s string) {
-  jsonObj, err := json.Marshal(e)
+type jsonConvertible interface {}
+
+func JsonString( obj jsonConvertible ) (s string) {
+  jsonObj, err := json.Marshal( obj )
   
   if err != nil {
     s = ""
-    return
+  } else {
+    s = string( jsonObj )
   }
 
-  s = string( jsonObj )
-  return 
+  return
 }
 
 func main() {
   // := is a short variable declaration it types and instantiates the var 'on the fly'
   m := martini.Classic()
 
-  m.Get("/attributes/:resource", func( params martini.Params ) (int, string) {
+  m.Get("/attributes/:resource", func( params martini.Params, writer http.ResponseWriter ) (int, string) {
     resource :=  strings.ToLower( params["resource"] )
+    writer.Header().Set("Content-Type", "application/json")
 
     if resource  == "tv" {
-      return http.StatusOK, "a TV attributes object will be returned here"
+      resourceAttrs := ResourceAttributes{"tv", make([]Attribute, 1)}
+      resourceAttrs.Attributes[0] = Attribute{"Location","string", "What facility is the TV located in.", true}
+     
+      return http.StatusOK, JsonString( resourceAttrs )
     } else {
-      return http.StatusNotFound, ErrorMsg{"Resource not found: " + resource}.String()
+      return http.StatusNotFound, JsonString( ErrorMsg{"Resource not found: " + resource} )
     }
+
   })
 
   m.Run()
