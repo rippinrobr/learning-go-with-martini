@@ -1,25 +1,37 @@
 package main
 
 import ( 
-  "net/http"
   "strings"
   "encoding/json"
+  "net/http"
+
   "github.com/codegangsta/martini"
-  "labix.org/v2/mgo"  // brings the mgo library into my code
+  "github.com/codegangsta/martini-contrib/binding"
+  "labix.org/v2/mgo"
   "labix.org/v2/mgo/bson" 
 )
 
 // Structs and related code
 type attribute struct {
-  Id string `json:"id"`
   Name string `json:"name"`
   DataType string `json:"type"`
   Description string `json:"description"`
   Required bool `json:"required"`
 }
 
+func (attr *attribute) Validate( errors *binding.Errors, req *http.Request ) {
+  if attr.Name == "" {
+    errors.Overall["missing-requirement"] = "name is a required field";
+  }
+
+  if attr.DataType == "" {
+    attr.DataType = "string"
+  }
+}
+
+
 type resourceAttributes struct {
-  ResourceName string `json: "resourceName"`
+  Resource string `json: "resource"` 
   Attributes []attribute `json: "attributes"`
 }
 
@@ -76,4 +88,22 @@ func getAttributes( params martini.Params, writer http.ResponseWriter, db *mgo.D
   } else {
     return http.StatusNotFound, jsonString( errorMsg{"No attributes found for the resource: " + resource} )
   }
+}
+
+func addAttribute( attr attribute, err binding.Errors, params martini.Params, writer http.ResponseWriter, db *mgo.Database) (int, string)  {
+  writer.Header().Set("Content-Type", "application/json")
+
+  if err.Count() > 0 {
+    return http.StatusConflict, jsonString( errorMsg{ err.Overall["missing-requirement"] } )
+  }
+  
+  resource :=  strings.ToLower( params["resource"] )
+  query  := bson.M{"resource": resource }
+  update := mgo.Change{  Upsert: true, Update: bson.M{ "$addToSet" : bson.M{ "attributes" : attr }} }
+
+  if _, err := db.C("resource_attributes").Find( query ).Apply( update, &attr);  err != nil {
+    return http.StatusConflict, jsonString( errorMsg{ err.Error() } )
+  }
+
+  return http.StatusOK, jsonString( update )
 }
