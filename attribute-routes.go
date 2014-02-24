@@ -80,15 +80,11 @@ func getAttributes( params martini.Params, writer http.ResponseWriter, db *mgo.D
   resource :=  strings.ToLower( params["resource"] )
   writer.Header().Set("Content-Type", "application/json")
 
-  var attrs []resourceAttributes
-  db.C("resource_attributes").Find(bson.M{"resource": resource }).All(&attrs);
+  attrs := resourceAttributes{}
+  err   := db.C("resource_attributes").Find(bson.M{"resource": resource }).One(&attrs)
 
-  if attrs != nil {
-    if len( attrs ) == 1 {
-      return http.StatusOK, jsonString( attrs[0] )
-    } else {
-      return http.StatusNotFound, jsonString( errorMsg{"More than one document found for resource: " + resource} )
-    }
+  if err == nil {
+    return http.StatusOK, jsonString( attrs )
   } else {
     return http.StatusNotFound, jsonString( errorMsg{"No attributes found for the resource: " + resource} )
   }
