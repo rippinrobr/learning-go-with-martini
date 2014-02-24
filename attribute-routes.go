@@ -84,7 +84,11 @@ func getAttributes( params martini.Params, writer http.ResponseWriter, db *mgo.D
   db.C("resource_attributes").Find(bson.M{"resource": resource }).All(&attrs);
 
   if attrs != nil {
-    return http.StatusOK, jsonString( attrs ) //resourceAttrs )
+    if len( attrs ) == 1 {
+      return http.StatusOK, jsonString( attrs[0] )
+    } else {
+      return http.StatusNotFound, jsonString( errorMsg{"More than one document found for resource: " + resource} )
+    }
   } else {
     return http.StatusNotFound, jsonString( errorMsg{"No attributes found for the resource: " + resource} )
   }
@@ -101,9 +105,9 @@ func addAttribute( attr attribute, err binding.Errors, params martini.Params, wr
   query  := bson.M{"resource": resource }
   update := mgo.Change{  Upsert: true, Update: bson.M{ "$addToSet" : bson.M{ "attributes" : attr }} }
 
-  if _, err := db.C("resource_attributes").Find( query ).Apply( update, &attr);  err != nil {
-    return http.StatusConflict, jsonString( errorMsg{ err.Error() } )
+  if _, dbErr := db.C("resource_attributes").Find( query ).Apply( update, &attr); dbErr != nil {
+    return http.StatusConflict, jsonString( errorMsg{ dbErr.Error() } )
   }
 
-  return http.StatusOK, jsonString( update )
+  return http.StatusOK, "{}"
 }
