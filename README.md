@@ -19,8 +19,10 @@ _post will be published soon_
 * blog post [Learning Go with a Martini - Working with MongoDB]() - Scheduled for Publishing on Tuesday, 3/4.
 * The code [2nd-post branch](https://github.com/rippinrobr/learning-go-with-martini/tree/2nd-post)
 
-## Creating My Own Package
-Create my own package that will make calls to etcd to retrieve application configuration values
+## Creating a Configuration Package
+Create my own package that will make calls to etcd to retrieve application configuration and monitor available services
+* blog post [Learning Go with a Martini - Creating a Configuration Package]() - Scheduled for Publishing on Tuesday, 3/11.
+* The code [3rd-post branch](https://github.com/rippinrobr/learning-go-with-martini/tree/3nd-post)
 
 ## Intro to Testing
 
