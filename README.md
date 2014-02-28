@@ -7,8 +7,10 @@ my sample app. As the posts are plublished there will be a 'read it'.
 
 ## Build Web Applications with Go &amp; Martini
 The beginnings, setup your Go environment and create an app that returns
-JSON.  The code is available on the [1st-post branch](https://github.com/rippinrobr/learning-go-with-martini/tree/1st-post)
-_post will be published soon_
+JSON.  
+
+* blog post [Learning Go with a Martini - The Basics](http://progadventure.blogspot.com/2014/02/learning-go-with-martini-basics.html).  
+* The code [1st-post branch](https://github.com/rippinrobr/learning-go-with-martini/tree/1st-post)
 
 ## Working with MongoDB
 This post will convert the HTTP GET from the first post into code that reads from MongoDB.  I will also add a POST call that
