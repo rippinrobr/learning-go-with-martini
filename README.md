@@ -15,8 +15,8 @@ JSON.
 ### Working with MongoDB
 This post will convert the HTTP GET from the first post into code that reads from MongoDB.  I will also add a POST call that
 stores the data in the MongoDb.  
-_post will be published soon_
-* blog post *Scheduled for Publishing on Tuesday, 3/4*
+
+* blog post [Learning Go with Martini - Working with MongoDB](http://progadventure.blogspot.com/2014/03/learning-go-with-martini-working-with.html)
 * The code [2nd-post branch](https://github.com/rippinrobr/learning-go-with-martini/tree/2nd-post)
 
 ### Creating My Own Package
