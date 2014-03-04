@@ -1,10 +1,12 @@
 package main
 
 import ( 
+  "fmt"
   "strings"
   "encoding/json"
   "net/http"
 
+  "github.com/rippinrobr/learning-go-with-martini/config"
   "github.com/codegangsta/martini"
   "github.com/codegangsta/martini-contrib/binding"
   "labix.org/v2/mgo"
@@ -55,6 +57,7 @@ func jsonString( obj jsonConvertible ) (s string) {
 
 // Middleware
 func Mongo() martini.Handler {
+  fmt.Println( config.GetDbConfig( "resources" ) );
   session, err := mgo.Dial( "localhost/goattrs" )
   if err != nil {
     panic( err )
