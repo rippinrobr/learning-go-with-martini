@@ -31,7 +31,6 @@ func (attr *attribute) Validate( errors *binding.Errors, req *http.Request ) {
   }
 }
 
-
 type resourceAttributes struct {
   Resource string `json: "resource"` 
   Attributes []attribute `json: "attributes"`
@@ -55,21 +54,26 @@ func jsonString( obj jsonConvertible ) (s string) {
   return
 }
 
-var dbInfo config.MongoInfo
+func setJsonResponseHeader( writer http.ResponseWriter ) {
+  writer.Header().Set("Content-Type", "application/json")
+}
 
 // Middleware
+var dbInfo config.MongoInfo
+
 func Mongo() martini.Handler {
   dbInfo = config.GetDbConfig( "resources" );
   fmt.Println( dbInfo )
 
   session, err := mgo.Dial( dbInfo.ConnString  )
   if err != nil {
+    fmt.Println("[Mongo()] PANIC");
     panic( err )
   }
 
   return func (c martini.Context ) {
     reqSession := session.Clone()
-    c.Map( reqSession.DB( "goattrs" ) )
+    c.Map( reqSession.DB( dbInfo.Database ) )
     defer reqSession.Close()
     c.Next()
   }
@@ -78,17 +82,17 @@ func Mongo() martini.Handler {
 // Handlers start here
 func createAttribute( params martini.Params, writer http.ResponseWriter ) (int, string) {
   resource :=  strings.ToLower( params["resource"] )
-  writer.Header().Set("Content-Type", "application/json")
+  setJsonResponseHeader( writer ) //.Header().Set("Content-Type", "application/json")
 
   return http.StatusOK, "Pseudo Create assigned to " + resource
 }
 
 func getAttributes( params martini.Params, writer http.ResponseWriter, db *mgo.Database) (int, string) {
   resource :=  strings.ToLower( params["resource"] )
-  writer.Header().Set("Content-Type", "application/json")
+  setJsonResponseHeader( writer ) //.Header().Set("Content-Type", "application/json")
 
   attrs := resourceAttributes{}
-  err   := db.C("resource_attributes").Find(bson.M{"resource": resource }).One(&attrs)
+  err   := db.C( dbInfo.Collection ).Find(bson.M{"resource": resource }).One(&attrs)
 
   if err == nil {
     return http.StatusOK, jsonString( attrs )
@@ -98,7 +102,7 @@ func getAttributes( params martini.Params, writer http.ResponseWriter, db *mgo.D
 }
 
 func addAttribute( attr attribute, err binding.Errors, params martini.Params, writer http.ResponseWriter, db *mgo.Database) (int, string)  {
-  writer.Header().Set("Content-Type", "application/json")
+  setJsonResponseHeader( writer ) //.Header().Set("Content-Type", "application/json")
 
   if err.Count() > 0 {
     return http.StatusConflict, jsonString( errorMsg{ err.Overall["missing-requirement"] } )
@@ -108,7 +112,7 @@ func addAttribute( attr attribute, err binding.Errors, params martini.Params, wr
   query  := bson.M{"resource": resource }
   update := mgo.Change{  Upsert: true, Update: bson.M{ "$addToSet" : bson.M{ "attributes" : attr }} }
 
-  if _, dbErr := db.C("resource_attributes").Find( query ).Apply( update, &attr); dbErr != nil {
+  if _, dbErr := db.C( dbInfo.Collection ).Find( query ).Apply( update, &attr); dbErr != nil {
     return http.StatusConflict, jsonString( errorMsg{ dbErr.Error() } )
   }
 
