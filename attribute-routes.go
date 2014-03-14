@@ -1,83 +1,14 @@
 package main
 
 import ( 
-  "fmt"
   "strings"
-  "encoding/json"
   "net/http"
 
-  "github.com/rippinrobr/learning-go-with-martini/config"
   "github.com/codegangsta/martini"
   "github.com/codegangsta/martini-contrib/binding"
   "labix.org/v2/mgo"
   "labix.org/v2/mgo/bson" 
 )
-
-// Structs and related code
-type attribute struct {
-  Name string `json:"name"`
-  DataType string `json:"type"`
-  Description string `json:"description"`
-  Required bool `json:"required"`
-}
-
-func (attr *attribute) Validate( errors *binding.Errors, req *http.Request ) {
-  if attr.Name == "" {
-    errors.Overall["missing-requirement"] = "name is a required field";
-  }
-
-  if attr.DataType == "" {
-    attr.DataType = "string"
-  }
-}
-
-type resourceAttributes struct {
-  Resource string `json: "resource"` 
-  Attributes []attribute `json: "attributes"`
-}
-
-type errorMsg struct {
-  Msg string `json:"msg"`
-}
-
-type jsonConvertible interface {}
-
-func jsonString( obj jsonConvertible ) (s string) {
-  jsonObj, err := json.Marshal( obj )
-  
-  if err != nil {
-    s = ""
-  } else {
-    s = string( jsonObj )
-  }
-
-  return
-}
-
-func setJsonResponseHeader( writer http.ResponseWriter ) {
-  writer.Header().Set("Content-Type", "application/json")
-}
-
-// Middleware
-var dbInfo config.MongoInfo
-
-func Mongo() martini.Handler {
-  dbInfo = config.GetDbConfig( "resources" );
-  fmt.Println( dbInfo )
-
-  session, err := mgo.Dial( dbInfo.ConnString  )
-  if err != nil {
-    fmt.Println("[Mongo()] PANIC");
-    panic( err )
-  }
-
-  return func (c martini.Context ) {
-    reqSession := session.Clone()
-    c.Map( reqSession.DB( dbInfo.Database ) )
-    defer reqSession.Close()
-    c.Next()
-  }
-}
 
 // Handlers start here
 func createAttribute( params martini.Params, writer http.ResponseWriter ) (int, string) {

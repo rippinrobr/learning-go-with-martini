@@ -12,5 +12,6 @@ func main() {
   m.Get("/attributes/:resource",  getAttributes )
   m.Post("/attributes/:resource", binding.Json( attribute{} ), addAttribute  )
 
+//  RegisterService
   m.Run()
 }
