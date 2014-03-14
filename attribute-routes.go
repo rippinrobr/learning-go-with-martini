@@ -55,10 +55,14 @@ func jsonString( obj jsonConvertible ) (s string) {
   return
 }
 
+var dbInfo config.MongoInfo
+
 // Middleware
 func Mongo() martini.Handler {
-  fmt.Println( config.GetDbConfig( "resources" ) );
-  session, err := mgo.Dial( "localhost/goattrs" )
+  dbInfo = config.GetDbConfig( "resources" );
+  fmt.Println( dbInfo )
+
+  session, err := mgo.Dial( dbInfo.ConnString  )
   if err != nil {
     panic( err )
   }
