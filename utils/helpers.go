@@ -3,6 +3,7 @@ package utils
 import (
   "fmt"
   "os"
+  "encoding/json"
 
   "github.com/coreos/go-etcd/etcd"  
 )
@@ -41,6 +42,21 @@ func GetDbConfig( service string ) MongoInfo {
   return mongoInfo
 }
 
+
+func JsonString( obj JsonConvertible ) (s string) {
+  jsonObj, err := json.Marshal( obj )
+  
+  if err != nil {
+    s = ""
+  } else {
+    s = string( jsonObj )
+  }
+
+  return
+}
+
 func RegisterService( serviceDesc ServiceDescription ) bool {
+  fmt.Println( JsonString( serviceDesc ) )
+
   return true
 }

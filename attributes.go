@@ -1,11 +1,9 @@
 package main
 
 import (
-  "encoding/json"
   "net/http"
 
   "github.com/codegangsta/martini-contrib/binding"
-  "github.com/rippinrobr/learning-go-with-martini/utils"
 )
 
 // Structs and related code
@@ -33,16 +31,4 @@ type resourceAttributes struct {
 
 type errorMsg struct {
   Msg string `json:"msg"`
-}
-
-func jsonString( obj utils.JsonConvertible ) (s string) {
-  jsonObj, err := json.Marshal( obj )
-  
-  if err != nil {
-    s = ""
-  } else {
-    s = string( jsonObj )
-  }
-
-  return
 }
