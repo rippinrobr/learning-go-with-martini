@@ -1,3 +1,5 @@
+_I know it has been a while since I've written a post on this series but now that some things are starting to calm down on the family side of things I have started writing the third post in this series. There will still be a little lag inbetween posts but there will be posts!_
+
 Learning Go with Martini - Blog Series
 ======================================
 This repository contains the code for a series of blog posts that I am
@@ -19,10 +21,10 @@ stores the data in the MongoDb.
 * blog post [Learning Go with Martini - Working with MongoDB](http://progadventure.blogspot.com/2014/03/learning-go-with-martini-working-with.html)
 * The code [2nd-post branch](https://github.com/rippinrobr/learning-go-with-martini/tree/2nd-post)
 
-### Creating My Own Package
-Create my own package that will make calls to etcd to retrieve application configuration values
+### Intro to Testing
+This post will cover how to write unit tests for my package that will communicate with the etcd service to retrieve config values.
 
-* blog post *Scheduled for Publishing on Tuesday, 3/11*
+* blog post *Scheduled for Publishing No Later Than Tuesday, August 5*
 
 ### Intro to Testing
 
