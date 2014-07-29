@@ -4,6 +4,7 @@ import (
   "fmt"
   "net/http"
 
+  "github.com/rippinrobr/learning-go-with-martini/config"
   "github.com/rippinrobr/learning-go-with-martini/utils"
   "github.com/codegangsta/martini"
   "labix.org/v2/mgo"
@@ -17,7 +18,7 @@ func setJsonResponseHeader( writer http.ResponseWriter ) {
 var dbInfo utils.MongoInfo
 
 func Mongo() martini.Handler {
-  dbInfo = utils.GetDbConfig( "resources" );
+  dbInfo = config.GetDbConfig( "resources" );
   fmt.Println( dbInfo )
 
   session, err := mgo.Dial( dbInfo.ConnString  )

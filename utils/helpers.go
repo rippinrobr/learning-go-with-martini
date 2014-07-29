@@ -2,16 +2,12 @@ package utils
 
 import (
   "fmt"
-  "os"
   "encoding/json"
-
-  "github.com/coreos/go-etcd/etcd"  
 )
 
-type ServiceDescription struct {
-  Name string `json:"name"`
-  URI string `json:"uri"`
-  Description string `json:"description"`
+type Keyval struct {
+  Key string
+  Val string
 }
 
 type MongoInfo struct {
@@ -24,24 +20,19 @@ func (mi MongoInfo) String() string {
   return fmt.Sprintf("[MongoInfo]\nConnString: %s\nCollection: %s\nDatabase: %s\n", mi.ConnString, mi.Collection, mi.Database)
 }
 
-func GetDbConfig( service string ) MongoInfo {
-  etcdServer := os.Getenv("GD_ETCD_SERVER")
-  if etcdServer == "" {
-    etcdServer = "http://127.0.0.1:4001"
-  }
-
-  etcdClient := etcd.NewClient([]string{ etcdServer }) 
-  results, error := etcdClient.Get("mongo/" + service , true, false)
-
-  if error != nil {
-    panic( error );
-  }
-  
-  mongoInfo := MongoInfo{ results.Node.Nodes[0].Value, results.Node.Nodes[1].Value, results.Node.Nodes[2].Value }
-   
-  return mongoInfo
+type ServiceDescription struct {
+  Name string `json:"name"`
+  Server string `json:"server"`
+  Description string `json:"description"`
 }
 
+func (sd ServiceDescription) CreateEtcdKeyValues() (Keyval, Keyval) {
+  return Keyval{fmt.Sprintf("services/%s/Server", sd.Name ), sd.Server}, Keyval{fmt.Sprintf("services/%s/Description", sd.Name), sd.Description}
+}
+
+func (sd ServiceDescription) String() string {
+  return fmt.Sprintf("[ServiceDescription]\nName: %s\nServer: %s\nDescription: %s\n", sd.Name, sd.Server, sd.Description)
+}
 
 func JsonString( obj JsonConvertible ) (s string) {
   jsonObj, err := json.Marshal( obj )
@@ -53,10 +44,4 @@ func JsonString( obj JsonConvertible ) (s string) {
   }
 
   return
-}
-
-func RegisterService( serviceDesc ServiceDescription ) bool {
-  fmt.Println( JsonString( serviceDesc ) )
-
-  return true
 }
