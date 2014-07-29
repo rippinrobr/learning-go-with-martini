@@ -7,6 +7,7 @@ import (
   "github.com/codegangsta/martini"
   "github.com/codegangsta/martini-contrib/binding"
   "github.com/rippinrobr/learning-go-with-martini/utils"
+  "github.com/codegangsta/martini-contrib/render"
   "labix.org/v2/mgo"
   "labix.org/v2/mgo/bson" 
 )
@@ -42,4 +43,15 @@ func addAttribute( attr attribute, err binding.Errors, params martini.Params, wr
   }
 
   return http.StatusOK, "{}"
+}
+
+func displayResourcesPage( r render.Render, db *mgo.Database) {
+  attrs := []resourceAttributes{}
+  err   := db.C( dbInfo.Collection ).Find(bson.M{}).All(&attrs)
+
+  if err == nil {  
+    r.HTML(200, "resources", attrs)
+  } else {
+    r.HTML(404, "404", err) 
+  }
 }
