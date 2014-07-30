@@ -22,9 +22,12 @@
       
       <h3><span id="selected-resource"></span><small>&nbsp;available attributes</small></h3>
       {{range .}}
-         <div id="{{.Resource}}" style="display:none">
+         <div id="{{.Resource}}" class="row" style="display:none">  
 	   {{ range .Attributes}}
-	      Name: {{.Name}} <br/>
+             <div class="row"> 
+  	       <h5 class="subheader">{{.Name}} <small>{{.DataType}}&nbsp{{ if .Required}} REQUIRED {{end}}</small></h5>
+               <p>{{.Description}}</p>
+	     </div>
            {{ end }}
          </div>
       {{end}}
