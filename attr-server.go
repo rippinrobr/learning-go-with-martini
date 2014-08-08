@@ -20,9 +20,8 @@ func main() {
   m.Post("/attributes/:resource", binding.Json( attribute{} ), addAttribute  )
 
   // HTML Calls
-	m.Get("/", displayResourcesPage) /*func( r render.Render) {
-	  r.HTML(200, "resources", "Rob")
-  })*/
+  m.Get("/", displayResourcesPage)
+  m.Post("/resource", binding.Bind( resource{} ), addResource)
 
   service := utils.ServiceDescription{"attributes", "http://localhost:3000", "Service that manages the attributes available for each resource type"}
   fmt.Println( config.RegisterService( service ) )

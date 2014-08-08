@@ -16,7 +16,7 @@ type attribute struct {
 
 func (attr *attribute) Validate( errors *binding.Errors, req *http.Request ) {
   if attr.Name == "" {
-    errors.Overall["missing-requirement"] = "name is a required field";
+    errors.Overall["missing-requirement"] = " name is a required field";
   }
 
   if attr.DataType == "" {
@@ -25,8 +25,12 @@ func (attr *attribute) Validate( errors *binding.Errors, req *http.Request ) {
 }
 
 type resourceAttributes struct {
-  Resource string `json: "resource"` 
+	Resource string `json: "resource"` 
   Attributes []attribute `json: "attributes"`
+}
+
+type resource struct {
+	ResourceName string `form:"resourceName"`
 }
 
 type errorMsg struct {

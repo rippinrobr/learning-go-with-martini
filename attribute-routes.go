@@ -1,6 +1,7 @@
 package main
 
 import ( 
+  "fmt"
   "strings"
   "net/http"
 
@@ -43,6 +44,18 @@ func addAttribute( attr attribute, err binding.Errors, params martini.Params, wr
   }
 
   return http.StatusOK, "{}"
+}
+
+func addResource( resource resource, w http.ResponseWriter, req *http.Request, db *mgo.Database ) {
+    // create query
+    // create resourceAttribute obj
+	resAttr := resourceAttributes{Resource:resource.ResourceName}
+    fmt.Println( resAttr )
+
+
+    http.Redirect(w, req, "/", 302)
+    // do insert
+    // fetch data and display page
 }
 
 func displayResourcesPage( r render.Render, db *mgo.Database) {
