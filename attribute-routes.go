@@ -47,15 +47,17 @@ func addAttribute( attr attribute, err binding.Errors, params martini.Params, wr
 }
 
 func addResource( resource resource, w http.ResponseWriter, req *http.Request, db *mgo.Database ) {
-    // create query
     // create resourceAttribute obj
-	resAttr := resourceAttributes{Resource:resource.ResourceName}
+    resAttr := resourceAttributes{Resource:resource.ResourceName}
     fmt.Println( resAttr )
-
-
-    http.Redirect(w, req, "/", 302)
+   
     // do insert
-    // fetch data and display page
+    dbErr := db.C( dbInfo.Collection ).Insert( &resAttr )  
+    if dbErr != nil {
+      // I wouldn't do this in the production version but I will for blogging purposes
+      panic( dbErr )
+    }
+    http.Redirect(w, req, "/", 302)
 }
 
 func displayResourcesPage( r render.Render, db *mgo.Database) {
