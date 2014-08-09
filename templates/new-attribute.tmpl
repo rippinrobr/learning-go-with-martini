@@ -1,0 +1,9 @@
+{{define "new-attribute"}}
+<form action="" method="POST" name="newResourceForm" id="newAttributeForm">
+  <input type="text" placeholder="Attribute Name" name="name" style="width:40%;" />
+  <input type="text" placeholder="Data Type" name="type" style="width:40%;" />
+  <input type="text" placeholder="Description" name="description" style="width:40%;"/>
+  <input type="checkbox" name="required"/>Required?
+  <input type="submit" value="Add Attribute"/>
+</form>
+{{end}}

@@ -25,12 +25,12 @@ func (attr *attribute) Validate( errors *binding.Errors, req *http.Request ) {
 }
 
 type resourceAttributes struct {
-	Resource string `json: "resource"` 
+  Resource string `json: "resource"` 
   Attributes []attribute `json: "attributes"`
 }
 
 type resource struct {
-	ResourceName string `form:"resourceName"`
+  ResourceName string `form:"resourceName"`
 }
 
 type errorMsg struct {

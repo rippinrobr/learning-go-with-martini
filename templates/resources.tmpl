@@ -31,7 +31,7 @@
            {{ end }}
          </div>
       {{end}}
-            
+      {{template "new-attribute"}}     
     </div>
     
     
@@ -54,6 +54,7 @@
    (function() {
      var resourceElems = document.getElementsByClassName("side-nav")[0]
        , h3Element  = document.getElementById("selected-resource")
+       , attrForm   = document.getElementById("newAttributeForm")
        , selectedResourceElem = null; 
   
 
@@ -64,6 +65,7 @@
        }
 
        elem.className = "active";
+       attrForm.setAttribute("action", '/attributes/' + elem.innerText );
        document.getElementById( elem.innerText ).setAttribute("style", "")       
        document.getElementById("selected-resource").innerText = elem.innerText;
        selectedResourceElem = elem;
